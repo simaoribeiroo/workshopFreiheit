@@ -1,0 +1,39 @@
+name: CI
+run-name: ${{ github.actor }} is running the CI 🚀
+on:
+    # Runs this when a PR against main is created
+    pull_request:
+      branches: [ "main" ]
+
+jobs:
+    build-lint-test:
+        runs-on: ubuntu-latest
+        steps:
+          # Fetches the GitHub repository files
+          - name: Check out repository code 
+            uses: actions/checkout@v4
+          
+          # Popular community-maintained action used to set up Flutter in GitHub workflows. 
+          # Installs Flutter and allows you to run commands like flutter build, flutter test, and flutter analyze within your CI/CD pipeline.
+          - name: Setup Flutter 
+            uses: subosito/flutter-action@v2
+            with:
+              channel: 'stable'
+          
+          # Fetch and install the dependencies listed in the project's pubspec.yaml file.
+          - name: Install dependencies
+            run: flutter pub get
+          
+          # Detect unformatted files and fail the pipeline if formatting issues exist.
+          # --set-exit-if-changed stops execution if the any code is not well formatted
+          # --output=none prints files which needs to be formatted
+          - name: Verify formatting
+            run: dart format --output=none --set-exit-if-changed .
+          
+          # Checks your project for code issues, potential errors, and enforces best practices.
+          - name: Analyze project source
+            run: flutter analyze
+          
+          # Checks your project for code issues, potential errors, and enforces best practices.
+          - name: Analyze project source
+            run: flutter build web
